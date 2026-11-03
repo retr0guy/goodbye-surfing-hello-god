@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Goodbye Surfing, Hello God — Audio Playlist</title>
+  <style>
+    :root {
+      --bg: #151a1c;
+      --panel: #20292b;
+      --soft: #283335;
+      --text: #f5f4ed;
+      --muted: #a7b5b4;
+      --accent: #9ddad1;
+      --outline: #415154;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 22px; background: var(--bg); color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .app { width: 100%; max-width: 760px; margin: 0 auto; }
+    .eyebrow { margin: 0 0 8px; color: var(--accent); font-size: 12px;
+      letter-spacing: .16em; font-weight: 750; text-transform: uppercase; }
+    h1 { font-size: clamp(25px, 4vw, 36px); line-height: 1.1; letter-spacing: -.035em; margin: 0 0 9px; }
+    .intro { margin: 0 0 20px; color: var(--muted); font-size: 14px; }
+    .player-card { border: 1px solid var(--outline); background: var(--panel);
+      border-radius: 19px; padding: 22px; }
+    .hero { display: flex; align-items: center; gap: 19px; margin-bottom: 21px; }
+    .cover { position: relative; width: 128px; height: 128px; border-radius: 14px;
+      flex: 0 0 128px; overflow: hidden; background: linear-gradient(170deg, #f7dca9, #ebaa85 56%, #426e70 57%, #173b42);
+      box-shadow: 0 5px 20px #0004; }
+    .sun { width: 64px; height: 64px; border-radius: 50%; background: #fff1c6;
+      position: absolute; left: 32px; top: 17px; opacity: .92; }
+    .line { position: absolute; width: 170%; height: 34px; left: -26%; border-radius: 50%; border-top: 3px solid #b0d5c6; }
+    .wave1 { top: 76px; transform: rotate(-8deg); }
+    .wave2 { top: 91px; transform: rotate(7deg); }
+    .wave3 { top: 110px; transform: rotate(-3deg); }
+    .now-label { margin: 0 0 7px; text-transform: uppercase; letter-spacing: .11em; color: var(--accent);
+      font-size: 11px; font-weight: 750; }
+    #now-playing { margin: 0; font-size: 23px; font-weight: 760; line-height: 1.25; }
+    .subtitle { margin: 7px 0 0; color: var(--muted); font-size: 13px; }
+    .progress { display: grid; grid-template-columns: 42px 1fr 42px; align-items: center; gap: 10px; margin-bottom: 17px; }
+    .clock { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; text-align: center; }
+    input[type="range"] { -webkit-appearance: none; appearance: none; cursor: pointer; border: none; border-radius: 100px;
+      height: 6px; margin: 0; width: 100%; outline-offset: 5px;
+      background: linear-gradient(to right, var(--accent) 0%, var(--accent) var(--pct, 0%), var(--outline) var(--pct, 0%), var(--outline) 100%); }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--text); border: 2px solid var(--accent); }
+    input[type="range"]::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: var(--text); border: 2px solid var(--accent); }
+    input[type="range"]:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .controls { display: flex; align-items: center; justify-content: center; gap: 13px; }
+    button { font: inherit; }
+    .icon-btn { border: 0; background: transparent; color: var(--text); cursor: pointer;
+      width: 43px; height: 43px; display: grid; place-items: center; border-radius: 50%; font-size: 22px; }
+    .icon-btn:hover { background: #ffffff12; }
+    .icon-btn[aria-pressed="true"] { color: var(--accent); background: #9ddad116; }
+    #play-pause { background: var(--accent); color: #152a2c; font-size: 22px; font-weight: 800;
+      width: 55px; height: 55px; }
+    #play-pause:hover { filter: brightness(1.08); }
+    .extras { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--outline); }
+    .mode { color: var(--muted); background: var(--soft); border: 1px solid transparent; padding: 7px 11px;
+      border-radius: 9px; font-size: 12px; cursor: pointer; }
+    .mode[aria-pressed="true"] { color: var(--accent); border-color: #9ddad16c; }
+    .volume { display: flex; align-items: center; gap: 10px; width: 120px; color: var(--muted); font-size: 17px; }
+    .volume input { flex: 1; min-width: 0; }
+    .section-title { display: flex; align-items: baseline; justify-content: space-between; margin: 23px 1px 10px; gap: 10px; }
+    h2 { margin: 0; font-size: 16px; }
+    .count { color: var(--muted); font-size: 12px; }
+    .list { display: grid; gap: 6px; }
+    .chapter { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left;
+      color: var(--text); border: 1px solid transparent; border-radius: 10px; padding: 13px 15px;
+      cursor: pointer; background: var(--panel); }
+    .chapter:hover { background: var(--soft); }
+    .chapter.active { background: #28423f; border-color: #579488; }
+    .number { width: 26px; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+    .chapter.active .number { color: var(--accent); }
+    .chapter-name { flex: 1; font-size: 14px; font-weight: 550; }
+    .playing-tag { display: none; font-size: 10px; font-weight: 800; color: var(--accent); letter-spacing: .08em; }
+    .chapter.active .playing-tag { display: inline; }
+    #status { min-height: 18px; color: #e8bca7; font-size: 12px; margin: 12px 0 0; }
+    .hint { margin: 12px 0 0; font-size: 12px; color: var(--muted); }
+    @media (max-width: 470px) {
+      body { padding: 12px; }
+      .player-card { padding: 16px; }
+      .cover { width: 84px; height: 84px; flex-basis: 84px; }
+      .sun { width: 43px; height: 43px; top: 12px; left: 20px; }
+      .wave1 { top: 51px; } .wave2 { top: 61px; } .wave3 { top: 73px; }
+      .hero { gap: 13px; }
+      #now-playing { font-size: 18px; }
+      .controls { gap: 3px; }
+      .progress { grid-template-columns: 36px 1fr 36px; gap: 7px; }
+      .volume { width: 90px; }
+      .chapter { padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <p class="eyebrow">Audiobook playlist</p>
+    <h1>Goodbye Surfing, Hello God</h1>
+    <p class="intro">8 parts · Select a chapter to start listening.</p>
+    <section class="player-card" aria-label="Audio player">
+      <div class="hero">
+        <div class="cover" aria-hidden="true">
+          <div class="sun"></div>
+          <div class="line wave1"></div><div class="line wave2"></div><div class="line wave3"></div>
+        </div>
+        <div>
+          <p class="now-label">Now selected</p>
+          <p id="now-playing">Part 1</p>
+          <p class="subtitle">Goodbye Surfing, Hello God</p>
+        </div>
+      </div>
+      <audio id="player" preload="metadata"></audio>
+      <div class="progress">
+        <span class="clock" id="elapsed">0:00</span>
+        <input id="seek" type="range" min="0" max="1000" step="1" value="0" aria-label="Seek within chapter">
+        <span class="clock" id="duration">0:00</span>
+      </div>
+      <div class="controls">
+        <button class="icon-btn" id="shuffle" aria-pressed="false" aria-label="Shuffle off" title="Shuffle">⇄</button>
+        <button class="icon-btn" id="previous" aria-label="Previous chapter" title="Previous">⏮</button>
+        <button class="icon-btn" id="play-pause" aria-label="Play" title="Play">▶</button>
+        <button class="icon-btn" id="next" aria-label="Next chapter" title="Next">⏭</button>
+        <button class="icon-btn" id="repeat" aria-pressed="true" aria-label="Repeat all" title="Repeat all">↻</button>
+      </div>
+      <div class="extras">
+        <button class="mode" id="repeat-description" title="Change repeat mode">Repeat: all</button>
+        <label class="volume" aria-label="Volume">🔊 <input id="volume" type="range" min="0" max="100" value="80" aria-label="Volume"></label>
+      </div>
+      <p id="status" role="status" aria-live="polite"></p>
+    </section>
+    <section aria-label="Chapters">
+      <div class="section-title"><h2>Chapters</h2><span class="count" id="count">8 tracks</span></div>
+      <div class="list" id="playlist"></div>
+    </section>
+    <p class="hint">Tip: When the page has focus, press Space to play/pause, or ← / → to seek 5 seconds.</p>
+  </main>
+
+  <script>
+    // These audio files must be in the SAME GitHub folder as this index.html file.
+    // To change chapters, edit only this list.
+    const tracks = [
+      { title: "Part 1", file: "01.mp3" },
+      { title: "Part 2", file: "02.mp3" },
+      { title: "Part 3", file: "03.mp3" },
+      { title: "Part 4", file: "04.mp3" },
+      { title: "Part 5", file: "05.mp3" },
+      { title: "Part 6", file: "06.mp3" },
+      { title: "Part 7", file: "07.mp3" },
+      { title: "Part 8", file: "08.mp3" }
+    ];
+
+    const $ = id => document.getElementById(id);
+    const player = $("player");
+    const list = $("playlist");
+    const seek = $("seek");
+    const elapsed = $("elapsed");
+    const duration = $("duration");
+    const nowPlaying = $("now-playing");
+    const playButton = $("play-pause");
+    const volume = $("volume");
+    const shuffleButton = $("shuffle");
+    const repeatButton = $("repeat");
+    const repeatDescription = $("repeat-description");
+    const status = $("status");
+    let currentIndex = 0;
+    let shuffle = false;
+    let repeatMode = "all"; // "off", "all", or "one"
+
+    const formatTime = seconds => {
+      if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
+      const n = Math.floor(seconds);
+      return `${Math.floor(n / 60)}:${String(n % 60).padStart(2, "0")}`;
+    };
+    const validDuration = () => Number.isFinite(player.duration) && player.duration > 0;
+    const setRangeFill = (range, percent) => range.style.setProperty("--pct", `${percent}%`);
+    setRangeFill(volume, 80);
+    player.volume = .8;
+
+    tracks.forEach((track, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "chapter";
+      button.innerHTML = `<span class="number">${String(index + 1).padStart(2, "0")}</span>`
+        + `<span class="chapter-name">${track.title}</span>`
+        + `<span class="playing-tag">SELECTED</span>`;
+      button.addEventListener("click", () => {
+        if (index !== currentIndex) selectTrack(index);
+        play();
+      });
+      list.appendChild(button);
+    });
+    const chapterButtons = Array.from(list.children);
+    $("count").textContent = `${tracks.length} tracks`;
+
+    function selectTrack(index, shouldScroll = true) {
+      if (index < 0 || index >= tracks.length) return;
+      currentIndex = index;
+      player.src = `./${tracks[index].file}`;
+      player.load();
+      nowPlaying.textContent = tracks[index].title;
+      elapsed.textContent = "0:00";
+      duration.textContent = "0:00";
+      seek.value = 0;
+      setRangeFill(seek, 0);
+      status.textContent = "";
+      chapterButtons.forEach((button, i) => {
+        const selected = i === index;
+        button.classList.toggle("active", selected);
+        button.setAttribute("aria-current", selected ? "true" : "false");
+      });
+      if (shouldScroll) chapterButtons[index].scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
+
+    async function play() {
+      try {
+        await player.play();
+        status.textContent = "";
+      } catch (error) {
+        status.textContent = "Playback couldn't start. Try pressing Play, and check that the MP3 files were uploaded beside index.html.";
+      }
+    }
+    function togglePlay() {
+      if (player.paused) play();
+      else player.pause();
+    }
+    function nextIndex() {
+      if (!shuffle || tracks.length < 2) return (currentIndex + 1) % tracks.length;
+      let index;
+      do { index = Math.floor(Math.random() * tracks.length); } while (index === currentIndex);
+      return index;
+    }
+    function next(manual = true) {
+      if (!manual && repeatMode === "one") {
+        player.currentTime = 0;
+        play();
+        return;
+      }
+      if (!manual && !shuffle && currentIndex === tracks.length - 1 && repeatMode === "off") {
+        player.pause();
+        return;
+      }
+      selectTrack(nextIndex());
+      play();
+    }
+    function previous() {
+      if (player.currentTime > 3) {
+        player.currentTime = 0;
+        return;
+      }
+      selectTrack((currentIndex - 1 + tracks.length) % tracks.length);
+      play();
+    }
+    function cycleRepeat() {
+      repeatMode = repeatMode === "all" ? "one" : repeatMode === "one" ? "off" : "all";
+      repeatDescription.textContent = `Repeat: ${repeatMode}`;
+      repeatButton.title = `Repeat ${repeatMode}`;
+      repeatButton.setAttribute("aria-label", `Repeat ${repeatMode}`);
+      repeatButton.setAttribute("aria-pressed", String(repeatMode !== "off"));
+    }
+    function updateProgress() {
+      const percent = validDuration() ? player.currentTime / player.duration * 100 : 0;
+      seek.value = String(Math.round(percent * 10));
+      setRangeFill(seek, percent);
+      elapsed.textContent = formatTime(player.currentTime);
+      duration.textContent = formatTime(player.duration);
+    }
+
+    playButton.addEventListener("click", togglePlay);
+    $("next").addEventListener("click", () => next(true));
+    $("previous").addEventListener("click", previous);
+    shuffleButton.addEventListener("click", () => {
+      shuffle = !shuffle;
+      shuffleButton.setAttribute("aria-pressed", String(shuffle));
+      shuffleButton.setAttribute("aria-label", shuffle ? "Shuffle on" : "Shuffle off");
+    });
+    repeatButton.addEventListener("click", cycleRepeat);
+    repeatDescription.addEventListener("click", cycleRepeat);
+    player.addEventListener("play", () => {
+      playButton.textContent = "❚❚";
+      playButton.title = "Pause";
+      playButton.setAttribute("aria-label", "Pause");
+    });
+    player.addEventListener("pause", () => {
+      playButton.textContent = "▶";
+      playButton.title = "Play";
+      playButton.setAttribute("aria-label", "Play");
+    });
+    player.addEventListener("loadedmetadata", updateProgress);
+    player.addEventListener("durationchange", updateProgress);
+    player.addEventListener("timeupdate", updateProgress);
+    player.addEventListener("ended", () => next(false));
+    player.addEventListener("error", () => {
+      status.textContent = `Couldn't load ${tracks[currentIndex].file}. Make sure it is uploaded in the same folder as index.html.`;
+    });
+    seek.addEventListener("input", () => {
+      if (!validDuration()) return;
+      const percent = Number(seek.value) / 1000;
+      player.currentTime = percent * player.duration;
+      setRangeFill(seek, percent * 100);
+      elapsed.textContent = formatTime(player.currentTime);
+    });
+    volume.addEventListener("input", () => {
+      player.volume = Number(volume.value) / 100;
+      setRangeFill(volume, Number(volume.value));
+    });
+    document.addEventListener("keydown", event => {
+      if (event.altKey || event.ctrlKey || event.metaKey || event.target.closest("button, input, textarea, select, a")) return;
+      if (event.code === "Space") { event.preventDefault(); togglePlay(); }
+      else if (event.key === "ArrowLeft") { event.preventDefault(); if (validDuration()) player.currentTime = Math.max(0, player.currentTime - 5); }
+      else if (event.key === "ArrowRight") { event.preventDefault(); if (validDuration()) player.currentTime = Math.min(player.duration, player.currentTime + 5); }
+    });
+
+    selectTrack(0, false);
+  </script>
+</body>
+</html>
